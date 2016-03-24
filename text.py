@@ -12,8 +12,6 @@
 # dictionary where the word is the index and the value is 1. 
 #	Finally, we use map reduce to count each value by index.
 
-#import wikipedia, easiest way to get wiki articles
-import wikipedia
 import urllib
 from bs4 import BeautifulSoup
 
@@ -52,8 +50,7 @@ def sum_counts(a,b):
 #load PySpark using the following line (shell):
 #PYSPARK_DRIVER_PYTHON=ipython pyspark
 
-#pres = wikipedia.page("Barack Obama").content
-pres = webtxt.getwebtxt("https://en.wikipedia.org/wiki/Barack_Obama")
+pres = getwebtxt("https://en.wikipedia.org/wiki/Barack_Obama")
 
 text_RDD = sc.parallelize(pres.split('\n'))
 
