@@ -9,35 +9,46 @@
 #	Ultimately, the goal is to use spark to distribute
 #	the words into partitions, and to map user defined function
 #	to split each line into a list of words, and create a 
-# dictionary where the word is the index and the value is 1. 
+# 	dictionary where the word is the index and the value is the
+#	number of times the word occurs. Initially, this value is 1. 
 #	Finally, we use map reduce to count each value by index.
 
-#import wikipedia, easiest way to get wiki articles
-import wikipedia
-import urllib
+import urllib2
 from bs4 import BeautifulSoup
 
-#for web scraping use the following function
 def getwebtxt(url):
-	html = urllib.urlopen(url).read()
+	"""This function will return the text of the web page.
+	Args:
+	  url: The HTTP resource locater.
+	Returns:
+	  A string representing the contents of the page.
+	Raises:
+	  ValueError if the url argument is invalid.
+	  URLError if there is a problem sending the request to the URL.
+	"""
+	if not url or not isinstance(url, str):
+		raise ValueError("getwebtxt requires a valid URL, got {0}".format(url))
+	req = urllib2.Request(url)
+	# This could raise a value error, but that's okay because
+	# we called out specifically in the function description
+	# that this function might raise a value error for a bad
+	# url.
+	html = urllib2.urlopen(req).read()
 	soup = BeautifulSoup(html)
 
 	# kill all script and style elements
 	for script in soup(["script", "style"]):
 		script.extract()    # rip it out
 
-	# get text
-	text = soup.get_text()
-
 	# break into lines and remove leading and trailing space on each
-	lines = (line.strip() for line in text.splitlines())
+	lines = (line.strip() for line in soup.get_text().splitlines())
 	
 	# break multi-headlines into a line each
 	chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
 	
 	# drop blank lines
 	text = '\n'.join(chunk for chunk in chunks if chunk)
-	return(text)
+	return text
 
 #user defined functions to split text lines and create dictionary 
 def split_words(line):
@@ -52,8 +63,7 @@ def sum_counts(a,b):
 #load PySpark using the following line (shell):
 #PYSPARK_DRIVER_PYTHON=ipython pyspark
 
-#pres = wikipedia.page("Barack Obama").content
-pres = webtxt.getwebtxt("https://en.wikipedia.org/wiki/Barack_Obama")
+pres = getwebtxt("https://en.wikipedia.org/wiki/Barack_Obama")
 
 text_RDD = sc.parallelize(pres.split('\n'))
 
