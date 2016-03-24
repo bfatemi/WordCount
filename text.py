@@ -9,7 +9,8 @@
 #	Ultimately, the goal is to use spark to distribute
 #	the words into partitions, and to map user defined function
 #	to split each line into a list of words, and create a 
-# dictionary where the word is the index and the value is 1. 
+# 	dictionary where the word is the index and the value is the
+#	number of times the word occurs. Initially, this value is 1. 
 #	Finally, we use map reduce to count each value by index.
 
 import urllib
